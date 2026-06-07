@@ -1,5 +1,5 @@
 
-package kcoin
+package com.damian1000.kcoin
 
 class BlockChain(val difficulty: Int) {
 

@@ -1,4 +1,4 @@
-package kcoin
+package com.damian1000.kcoin
 
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
