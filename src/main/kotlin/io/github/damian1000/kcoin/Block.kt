@@ -18,8 +18,8 @@ data class Block(val previousHash: String,
     }
 
     fun addTransaction(transaction: Transaction) : Block {
-        if (transaction.isSignatureValid())
-            transactions.add(transaction)
+        require(transaction.isSignatureValid()) { "Transaction signature is invalid; refusing to add to block" }
+        transactions.add(transaction)
         return this
     }
 

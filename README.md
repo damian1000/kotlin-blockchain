@@ -65,6 +65,7 @@ This is a teaching artifact, not a production node. The following are deliberate
 - **Mining is synchronous** inside `BlockChain.add(...)`. Real chains decouple mining from chain extension.
 - **RSA, not ECDSA.** Real cryptocurrencies use secp256k1 / Ed25519; RSA was chosen here for clarity using the JDK's built-in providers.
 - **Block hash includes `transactions.toString()`.** Works for a demo; a real implementation would hash a Merkle root for tamper-evident transaction trees.
+- **The `Transaction(sender, recipient, amount)` header is vestigial.** Real UTXO transactions don't have a single sender/recipient — those are derived from inputs and outputs. When a wallet calls `sendFundsTo(other, 15)`, the resulting `Transaction` has `sender = recipient = self`, and the actual transfer lives entirely in the `outputs` list. The header is kept for didactic clarity but is misleading; a real engine would drop it.
 
 ## Stack
 

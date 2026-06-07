@@ -1,6 +1,8 @@
 package io.github.damian1000.kcoin
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,6 +52,22 @@ class KCoinTest {
         assertEquals(85, wallet1.balance)
         assertEquals(5, wallet2.balance)
         assertEquals(10, wallet3.balance)
+    }
+
+    @Test
+    fun tamperedOutputInvalidatesSignature() {
+        createGenesisTransaction()
+        val tx = wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = 15)
+        assertTrue(tx.isSignatureValid())
+
+        // Sneak an extra output to wallet3 after the wallet has signed.
+        tx.outputs.add(TransactionItem(recipient = wallet3.publicKey, amount = 50, transactionHash = tx.hash))
+        assertFalse(tx.isSignatureValid(), "Adding outputs after signing must invalidate the signature")
+
+        // And a block must refuse to accept it.
+        assertThrows(IllegalArgumentException::class.java) {
+            Block(previousHash = "0").addTransaction(tx)
+        }
     }
 
 }

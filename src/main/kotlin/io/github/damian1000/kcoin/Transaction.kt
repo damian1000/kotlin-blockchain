@@ -42,11 +42,17 @@ data class Transaction(val sender: PublicKey,
     }
 
     fun sign(privateKey: PrivateKey) : Transaction {
-        signature = "${sender.encodeToString()}${recipient.encodeToString()}$amount".sign(privateKey)
+        signature = signaturePayload().sign(privateKey)
         return this
     }
 
     fun isSignatureValid() : Boolean {
-        return "${sender.encodeToString()}${recipient.encodeToString()}$amount".verifySignature(sender, signature)
+        return signaturePayload().verifySignature(sender, signature)
+    }
+
+    private fun signaturePayload(): String {
+        val inputsPart = inputs.joinToString(",") { it.hash }
+        val outputsPart = outputs.joinToString(",") { "${it.recipient.encodeToString()}:${it.amount}" }
+        return "${sender.encodeToString()}|${recipient.encodeToString()}|$amount|$inputsPart|$outputsPart"
     }
 }
