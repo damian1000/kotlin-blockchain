@@ -1,4 +1,4 @@
-package com.damian1000.kcoin
+package io.github.damian1000.kcoin
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
