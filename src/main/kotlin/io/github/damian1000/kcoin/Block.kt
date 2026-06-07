@@ -1,5 +1,6 @@
 package io.github.damian1000.kcoin
 
+import org.slf4j.LoggerFactory
 import java.time.Instant
 
 data class Block(val previousHash: String,
@@ -26,14 +27,17 @@ data class Block(val previousHash: String,
     fun mine(validPrefix: String) {
         val start = System.currentTimeMillis()
         while (!isMined(validPrefix)) {
-            nonce += 1;
-            hash = calculateHash();
+            nonce += 1
+            hash = calculateHash()
         }
-        println("Completed mining: " + (System.currentTimeMillis() - start) + " milliseconds. Nonce: " + nonce)
+        log.info("Completed mining in {} ms. Nonce: {}", System.currentTimeMillis() - start, nonce)
     }
 
     fun isMined(validPrefix: String) : Boolean {
         return hash.startsWith(validPrefix)
     }
 
+    companion object {
+        private val log = LoggerFactory.getLogger(Block::class.java)
+    }
 }

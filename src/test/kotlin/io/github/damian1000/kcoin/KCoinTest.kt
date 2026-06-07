@@ -55,6 +55,38 @@ class KCoinTest {
     }
 
     @Test
+    fun sendingMoreThanBalanceThrows() {
+        createGenesisTransaction()
+        assertThrows(IllegalArgumentException::class.java) {
+            wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = wallet1.balance + 1)
+        }
+    }
+
+    @Test
+    fun transactionItemIsMineDistinguishesOwners() {
+        val tx = Transaction.create(sender = wallet1.publicKey, recipient = wallet2.publicKey, amount = 5)
+        val item = TransactionItem(recipient = wallet2.publicKey, amount = 5, transactionHash = tx.hash)
+        assertTrue(item.isMine(wallet2.publicKey))
+        assertFalse(item.isMine(wallet1.publicKey))
+        assertEquals(tx.hash, item.transactionHash)
+        item.hash = "rewritten"
+        assertEquals("rewritten", item.hash)
+    }
+
+    @Test
+    fun emptyBlockChainAndSingleBlockChainAreValid() {
+        // empty chain valid by definition
+        assertTrue(BlockChain(1).isValid())
+
+        // single-block chain valid when its hash matches calculateHash()
+        val single = BlockChain(1)
+        single.add(Block(previousHash = "0").addGenesisTransaction(
+            Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 1)
+        ))
+        assertTrue(single.isValid())
+    }
+
+    @Test
     fun tamperedOutputInvalidatesSignature() {
         createGenesisTransaction()
         val tx = wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = 15)

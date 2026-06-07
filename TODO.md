@@ -1,9 +1,5 @@
 # TODO
 
-## Cleanup
-
-- Replace `println("Completed mining: ... milliseconds. Nonce: ...")` in `Block.mine()` with SLF4J. It's library code inside a recursive operation; structured logging fits better than a bare `println`. Use `org.jetbrains.kotlin:kotlin-stdlib-jdk8` already on the classpath plus `org.slf4j:slf4j-api` + `org.slf4j:slf4j-simple`.
-
 ## Possible enhancements
 
 - The vestigial `Transaction(sender, recipient, amount)` header could be dropped in favor of deriving sender/recipient from inputs/outputs (already noted as a teaching limitation in the README).
