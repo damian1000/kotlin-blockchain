@@ -22,7 +22,7 @@ class KCoinTest {
     }
 
     private fun createGenesisTransaction(): Block {
-        val genesisTransaction = Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 100)
+        val genesisTransaction = Transaction.create(signer = wallet1.publicKey)
         genesisTransaction.outputs.add(
             TransactionItem(recipient = wallet1.publicKey, amount = 100, transactionHash = genesisTransaction.hash),
         )
@@ -65,7 +65,7 @@ class KCoinTest {
 
     @Test
     fun transactionItemIsMineDistinguishesOwners() {
-        val tx = Transaction.create(sender = wallet1.publicKey, recipient = wallet2.publicKey, amount = 5)
+        val tx = Transaction.create(signer = wallet1.publicKey)
         val item = TransactionItem(recipient = wallet2.publicKey, amount = 5, transactionHash = tx.hash)
         assertTrue(item.isMine(wallet2.publicKey))
         assertFalse(item.isMine(wallet1.publicKey))
@@ -83,7 +83,7 @@ class KCoinTest {
         val single = BlockChain(1)
         single.add(
             Block(previousHash = "0").addGenesisTransaction(
-                Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 1),
+                Transaction.create(signer = wallet1.publicKey),
             ),
         )
         assertTrue(single.isValid())

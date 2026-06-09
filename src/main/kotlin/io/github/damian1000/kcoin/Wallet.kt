@@ -32,7 +32,7 @@ data class Wallet(
             throw IllegalArgumentException("Insufficient funds")
         }
 
-        val tx = Transaction.create(sender = publicKey, recipient = publicKey, amount = amountToSend)
+        val tx = Transaction.create(signer = publicKey)
         tx.outputs.add(TransactionItem(recipient = recipient, amount = amountToSend, transactionHash = tx.hash))
 
         var collectedAmount = 0

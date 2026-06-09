@@ -2,6 +2,7 @@ package io.github.damian1000.kcoin
 
 import java.security.PrivateKey
 import java.security.PublicKey
+import java.security.SecureRandom
 
 data class TransactionItem(
     val recipient: PublicKey,
@@ -16,10 +17,19 @@ data class TransactionItem(
     fun isMine(me: PublicKey): Boolean = recipient == me
 }
 
+/**
+ * A UTXO-model transaction. The wallet that authorizes the spend is the
+ * `signer`; the actual transfer is expressed entirely through `inputs`
+ * (UTXOs being consumed) and `outputs` (UTXOs being created). The signer's
+ * private key signs the full content.
+ *
+ * `nonce` is per-transaction cryptographically-random bytes (hex-encoded)
+ * so two transactions with identical signer + inputs + outputs still get
+ * distinct hashes. Replaces an earlier thread-unsafe counter.
+ */
 data class Transaction(
-    val sender: PublicKey,
-    val recipient: PublicKey,
-    val amount: Int,
+    val signer: PublicKey,
+    val nonce: String = generateNonce(),
     var hash: String = "",
     val inputs: MutableList<TransactionItem> = mutableListOf(),
     val outputs: MutableList<TransactionItem> = mutableListOf(),
@@ -27,21 +37,19 @@ data class Transaction(
     private var signature: ByteArray = ByteArray(0)
 
     init {
-        hash = "${sender.encodeToString()}${recipient.encodeToString()}$amount$salt".hash()
+        hash = "${signer.encodeToString()}$nonce".hash()
     }
 
     companion object {
-        fun create(
-            sender: PublicKey,
-            recipient: PublicKey,
-            amount: Int,
-        ): Transaction = Transaction(sender, recipient, amount)
+        fun create(signer: PublicKey): Transaction = Transaction(signer)
 
-        var salt: Long = 0
-            get() {
-                field += 1
-                return field
-            }
+        private val random = SecureRandom()
+
+        private fun generateNonce(): String {
+            val bytes = ByteArray(16)
+            random.nextBytes(bytes)
+            return bytes.joinToString("") { "%02x".format(it) }
+        }
     }
 
     fun sign(privateKey: PrivateKey): Transaction {
@@ -49,11 +57,11 @@ data class Transaction(
         return this
     }
 
-    fun isSignatureValid(): Boolean = signaturePayload().verifySignature(sender, signature)
+    fun isSignatureValid(): Boolean = signaturePayload().verifySignature(signer, signature)
 
     private fun signaturePayload(): String {
         val inputsPart = inputs.joinToString(",") { it.hash }
         val outputsPart = outputs.joinToString(",") { "${it.recipient.encodeToString()}:${it.amount}" }
-        return "${sender.encodeToString()}|${recipient.encodeToString()}|$amount|$inputsPart|$outputsPart"
+        return "${signer.encodeToString()}|$nonce|$inputsPart|$outputsPart"
     }
 }
