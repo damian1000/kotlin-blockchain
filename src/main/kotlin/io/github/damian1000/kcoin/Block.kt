@@ -24,11 +24,19 @@ data class Block(val previousHash: String,
         return this
     }
 
-    fun mine(validPrefix: String) {
+    fun mine(validPrefix: String, maxIterations: Long = DEFAULT_MAX_MINE_ITERATIONS) {
+        require(maxIterations > 0) { "maxIterations must be positive" }
         val start = System.currentTimeMillis()
+        var iterations = 0L
         while (!isMined(validPrefix)) {
+            if (iterations >= maxIterations) {
+                throw MineException(
+                    "Failed to mine block with prefix '$validPrefix' after $maxIterations iterations"
+                )
+            }
             nonce += 1
             hash = calculateHash()
+            iterations += 1
         }
         log.info("Completed mining in {} ms. Nonce: {}", System.currentTimeMillis() - start, nonce)
     }
@@ -38,6 +46,9 @@ data class Block(val previousHash: String,
     }
 
     companion object {
+        const val DEFAULT_MAX_MINE_ITERATIONS = 10_000_000L
         private val log = LoggerFactory.getLogger(Block::class.java)
     }
 }
+
+class MineException(message: String) : RuntimeException(message)
