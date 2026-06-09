@@ -1,13 +1,16 @@
 
 package io.github.damian1000.kcoin
 
-class BlockChain(val difficulty: Int) {
-
+class BlockChain(
+    val difficulty: Int,
+) {
     private val blocks: MutableList<Block> = mutableListOf()
     private val validPrefix = "0".repeat(difficulty)
+
+    @Suppress("PropertyName") // UTXO (Unspent Transaction Output) is established domain terminology
     val UTXO: MutableMap<String, TransactionItem> = mutableMapOf()
 
-    fun isValid() : Boolean {
+    fun isValid(): Boolean {
         when {
             blocks.isEmpty() -> return true
             blocks.size == 1 -> return blocks[0].hash == blocks[0].calculateHash()
@@ -26,15 +29,18 @@ class BlockChain(val difficulty: Int) {
         }
     }
 
-    fun add(block: Block) : Block {
-        block.mine(validPrefix);
+    fun add(block: Block): Block {
+        block.mine(validPrefix)
         blocks.add(block)
         updateUTXO(block)
-        return block;
+        return block
     }
 
     private fun updateUTXO(block: Block) {
-        block.transactions.flatMap { it.inputs }.map { it.hash }.forEach { UTXO.remove(it) }
+        block.transactions
+            .flatMap { it.inputs }
+            .map { it.hash }
+            .forEach { UTXO.remove(it) }
         UTXO.putAll(block.transactions.flatMap { it.outputs }.associateBy { it.hash })
     }
 }

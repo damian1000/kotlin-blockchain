@@ -4,8 +4,11 @@ import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.PublicKey
 
-data class Wallet(val publicKey: PublicKey, val privateKey: PrivateKey, val blockChain: BlockChain) {
-
+data class Wallet(
+    val publicKey: PublicKey,
+    val privateKey: PrivateKey,
+    val blockChain: BlockChain,
+) {
     companion object {
         fun create(blockChain: BlockChain): Wallet {
             val generator = KeyPairGenerator.getInstance("RSA")
@@ -19,12 +22,12 @@ data class Wallet(val publicKey: PublicKey, val privateKey: PrivateKey, val bloc
         return getMyTransactions().sumOf { it.amount }
     }
 
-    private fun getMyTransactions() : Collection<TransactionItem> {
-        return blockChain.UTXO.filterValues { it.isMine(publicKey) }.values
-    }
+    private fun getMyTransactions(): Collection<TransactionItem> = blockChain.UTXO.filterValues { it.isMine(publicKey) }.values
 
-    fun sendFundsTo(recipient: PublicKey, amountToSend: Int) : Transaction {
-
+    fun sendFundsTo(
+        recipient: PublicKey,
+        amountToSend: Int,
+    ): Transaction {
         if (amountToSend > balance) {
             throw IllegalArgumentException("Insufficient funds")
         }

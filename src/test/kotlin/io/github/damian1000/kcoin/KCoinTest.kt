@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class KCoinTest {
-
     val blockChain = BlockChain(2)
     val wallet1 = Wallet.create(blockChain)
     val wallet2 = Wallet.create(blockChain)
@@ -24,7 +23,9 @@ class KCoinTest {
 
     private fun createGenesisTransaction(): Block {
         val genesisTransaction = Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 100)
-        genesisTransaction.outputs.add(TransactionItem(recipient = wallet1.publicKey, amount = 100, transactionHash = genesisTransaction.hash))
+        genesisTransaction.outputs.add(
+            TransactionItem(recipient = wallet1.publicKey, amount = 100, transactionHash = genesisTransaction.hash),
+        )
         val genesisBlock = Block(previousHash = "0")
         genesisBlock.addGenesisTransaction(genesisTransaction)
         blockChain.add(genesisBlock)
@@ -80,9 +81,11 @@ class KCoinTest {
 
         // single-block chain valid when its hash matches calculateHash()
         val single = BlockChain(1)
-        single.add(Block(previousHash = "0").addGenesisTransaction(
-            Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 1)
-        ))
+        single.add(
+            Block(previousHash = "0").addGenesisTransaction(
+                Transaction.create(sender = wallet1.publicKey, recipient = wallet1.publicKey, amount = 1),
+            ),
+        )
         assertTrue(single.isValid())
     }
 
@@ -101,5 +104,4 @@ class KCoinTest {
             Block(previousHash = "0").addTransaction(tx)
         }
     }
-
 }
