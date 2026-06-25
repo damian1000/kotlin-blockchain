@@ -13,7 +13,10 @@ class BlockChain(
     fun isValid(): Boolean {
         when {
             blocks.isEmpty() -> return true
-            blocks.size == 1 -> return blocks[0].hash == blocks[0].calculateHash()
+            blocks.size == 1 -> {
+                val block = blocks[0]
+                return block.hash == block.calculateHash() && block.isMined(validPrefix)
+            }
             else -> {
                 for (i in 1 until blocks.size) {
                     val previousBlock = blocks[i - 1]
