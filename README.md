@@ -55,17 +55,6 @@ bob.balance     // 30
 chain.isValid() // true
 ```
 
-## What's intentionally not here
-
-This is a teaching artifact, not a production node. The following are deliberately out of scope:
-
-- **No peer-to-peer / no consensus.** Single-node only — no fork choice, no longest-chain rule, no gossip protocol.
-- **No persistence.** The chain lives in memory; restart loses state.
-- **No fees, no block reward halving, no difficulty adjustment.**
-- **Mining is synchronous** inside `BlockChain.add(...)`. Real chains decouple mining from chain extension.
-- **RSA, not ECDSA.** Real cryptocurrencies use secp256k1 / Ed25519; RSA was chosen here for clarity using the JDK's built-in providers.
-- **Block hash includes `transactions.toString()`.** Works for a demo; a real implementation would hash a Merkle root for tamper-evident transaction trees.
-
 ## Stack
 
 - Kotlin 2.3.21 (JVM target 25)
