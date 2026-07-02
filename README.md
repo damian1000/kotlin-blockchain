@@ -11,7 +11,7 @@ A small blockchain in Kotlin that demonstrates the core primitives end-to-end: S
 - **Proof-of-work mining** — incrementing a `nonce` until the block hash starts with `N` zero characters (`difficulty`).
 - **UTXO accounting** — wallet balances are derived from unspent transaction outputs, not a mutable per-address ledger. Spending a UTXO removes it; change goes back to the sender as a new output.
 - **RSA-signed transactions** — each spend is signed with the sender's private key (`SHA256withRSA`); blocks only accept transactions whose signature verifies against the sender's public key.
-- **Chain validation** — every block's hash matches its recomputed hash, every `previousHash` matches its predecessor, and every block satisfies the PoW prefix (genesis included). Scope note: `isValid()` checks structural integrity and proof-of-work, *not* transaction-level rules — it does not re-verify signatures or detect double-spends across the chain. Signatures are validated when a transaction is accepted into a block; a from-scratch re-validation of the UTXO ledger is deliberately out of scope for this demo.
+- **Chain validation** — every block's hash matches its recomputed hash, every `previousHash` matches its predecessor, and every block satisfies the PoW prefix (genesis included). Scope note: `isValid()` checks structural integrity and proof-of-work, *not* transaction-level rules — it does not re-verify signatures or detect double-spends across the chain. Signatures are validated when a transaction is accepted into a block; a from-scratch re-validation of the UTXO ledger is deliberately out of scope here.
 
 ## Design
 
