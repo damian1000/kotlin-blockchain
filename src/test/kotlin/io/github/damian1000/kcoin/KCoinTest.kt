@@ -90,6 +90,38 @@ class KCoinTest {
     }
 
     @Test
+    fun chainWithTransactionTamperedAfterMiningIsInvalid() {
+        val genesisBlock = createGenesisTransaction()
+        val tx = wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = 15)
+        val block = blockChain.add(Block(genesisBlock.hash).addTransaction(tx))
+        assertTrue(blockChain.isValid())
+
+        // Forge an extra output after signing, then re-mine so the hash/link checks still pass —
+        // only the signature verification can catch this rewrite.
+        block.transactions[0].outputs.add(
+            TransactionItem(recipient = wallet3.publicKey, amount = 50, transactionHash = tx.hash),
+        )
+        block.hash = ""
+        block.mine("0".repeat(2))
+
+        assertFalse(blockChain.isValid(), "a rewritten spend must invalidate the chain")
+    }
+
+    @Test
+    fun chainWithUnsignedSpendIsInvalid() {
+        val genesisBlock = createGenesisTransaction()
+
+        // A spend (has inputs) that was never signed, smuggled in via the genesis path that
+        // bypasses the add-time signature check.
+        val forged = Transaction.create(signer = wallet1.publicKey)
+        forged.inputs.add(blockChain.UTXO.values.first())
+        forged.outputs.add(TransactionItem(recipient = wallet2.publicKey, amount = 100, transactionHash = forged.hash))
+        blockChain.add(Block(genesisBlock.hash).addGenesisTransaction(forged))
+
+        assertFalse(blockChain.isValid(), "an unsigned spend must invalidate the chain")
+    }
+
+    @Test
     fun tamperedOutputInvalidatesSignature() {
         createGenesisTransaction()
         val tx = wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = 15)

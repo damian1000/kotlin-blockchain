@@ -4,10 +4,12 @@ import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.PublicKey
 
-data class Wallet(
+// Deliberately not a data class: a generated toString/copy/equals over a PrivateKey would leak
+// or duplicate key material (JCA RSA keys print their internals).
+class Wallet(
     val publicKey: PublicKey,
-    val privateKey: PrivateKey,
-    val blockChain: BlockChain,
+    private val privateKey: PrivateKey,
+    private val blockChain: BlockChain,
 ) {
     companion object {
         fun create(blockChain: BlockChain): Wallet {

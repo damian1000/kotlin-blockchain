@@ -1,4 +1,3 @@
-
 package io.github.damian1000.kcoin
 
 class BlockChain(
@@ -10,26 +9,22 @@ class BlockChain(
     @Suppress("PropertyName") // UTXO (Unspent Transaction Output) is established domain terminology
     val UTXO: MutableMap<String, TransactionItem> = mutableMapOf()
 
+    /**
+     * A chain is valid when every block's stored hash matches its recomputed one, every block is
+     * mined to the difficulty prefix, every block links to its predecessor's hash, and every
+     * *spending* transaction (one with inputs) carries a valid signature. Transactions without
+     * inputs — genesis/coinbase issuance — have no prior owner to authorise them, so they are
+     * exempt from the signature rule.
+     */
     fun isValid(): Boolean {
-        when {
-            blocks.isEmpty() -> return true
-            blocks.size == 1 -> {
-                val block = blocks[0]
-                return block.hash == block.calculateHash() && block.isMined(validPrefix)
+        val blocksAreSound =
+            blocks.all { block ->
+                block.hash == block.calculateHash() &&
+                    block.isMined(validPrefix) &&
+                    block.transactions.all { it.inputs.isEmpty() || it.isSignatureValid() }
             }
-            else -> {
-                for (i in 1 until blocks.size) {
-                    val previousBlock = blocks[i - 1]
-                    val currentBlock = blocks[i]
-                    when {
-                        currentBlock.hash != currentBlock.calculateHash() -> return false
-                        currentBlock.previousHash != previousBlock.calculateHash() -> return false
-                        !previousBlock.isMined(validPrefix) || !currentBlock.isMined(validPrefix) -> return false
-                    }
-                }
-                return true
-            }
-        }
+        if (!blocksAreSound) return false
+        return (1 until blocks.size).all { blocks[it].previousHash == blocks[it - 1].hash }
     }
 
     fun add(block: Block): Block {

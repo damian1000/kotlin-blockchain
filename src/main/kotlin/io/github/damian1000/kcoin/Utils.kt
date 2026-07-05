@@ -32,7 +32,13 @@ fun String.verifySignature(
     val rsa = Signature.getInstance(algorithm)
     rsa.initVerify(publicKey)
     rsa.update(this.toByteArray())
-    return rsa.verify(signature)
+    // verify() throws (rather than returning false) for a structurally invalid signature, e.g.
+    // the empty byte array of a never-signed transaction — that's "invalid", not an error.
+    return try {
+        rsa.verify(signature)
+    } catch (e: java.security.SignatureException) {
+        false
+    }
 }
 
 fun Key.encodeToString(): String = Base64.getEncoder().encodeToString(this.encoded)
