@@ -1,1 +1,16 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.namespace == 'io.github.damian1000') {
+                useModule("com.github.damian1000:build-conventions:${requested.version}")
+            }
+        }
+    }
+}
+
 rootProject.name = 'kotlin-blockchain'
