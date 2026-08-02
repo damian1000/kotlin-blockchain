@@ -136,4 +136,47 @@ class KCoinTest {
             Block(previousHash = "0").addTransaction(tx)
         }
     }
+
+    @Test
+    fun negativeAmountCannotDrainTheRecipient() {
+        createGenesisTransaction()
+
+        // Without the guard this succeeded and left wallet1 = 140, wallet2 = -40: the recipient's
+        // balance moved to the sender on the sender's signature alone, which is theft, not a
+        // transfer. Only wallet1 signs here — wallet2 never consents to anything.
+        assertThrows(IllegalArgumentException::class.java) {
+            wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = -40)
+        }
+
+        assertEquals(100, wallet1.balance, "the sender gained nothing")
+        assertEquals(0, wallet2.balance, "the recipient lost nothing")
+        assertTrue(blockChain.isValid())
+    }
+
+    @Test
+    fun zeroAmountIsRejected() {
+        createGenesisTransaction()
+
+        // A zero transfer consumes an input to move nothing; there is no honest reading of it.
+        assertThrows(IllegalArgumentException::class.java) {
+            wallet1.sendFundsTo(recipient = wallet2.publicKey, amountToSend = 0)
+        }
+
+        assertEquals(100, wallet1.balance)
+        assertEquals(0, wallet2.balance)
+    }
+
+    @Test
+    fun aWalletWithNothingCannotSendANegativeAmountEither() {
+        createGenesisTransaction()
+
+        // wallet3 holds nothing, so the balance check alone would have waved -50 through and
+        // minted it a positive balance out of wallet1's coins.
+        assertThrows(IllegalArgumentException::class.java) {
+            wallet3.sendFundsTo(recipient = wallet1.publicKey, amountToSend = -50)
+        }
+
+        assertEquals(0, wallet3.balance)
+        assertEquals(100, wallet1.balance)
+    }
 }
