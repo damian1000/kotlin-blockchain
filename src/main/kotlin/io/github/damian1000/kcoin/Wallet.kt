@@ -30,6 +30,13 @@ class Wallet(
         recipient: PublicKey,
         amountToSend: Int,
     ): Transaction {
+        // A negative amount inverts the transfer: the recipient receives a negative output, and
+        // the change line computes collected - (-n), handing the sender more than it put in. So
+        // "sending" -40 moves 40 from the recipient to the sender, with only the sender's
+        // signature. The amount has to be positive before any of that arithmetic runs.
+        if (amountToSend <= 0) {
+            throw IllegalArgumentException("Amount to send must be positive, was $amountToSend")
+        }
         if (amountToSend > balance) {
             throw IllegalArgumentException("Insufficient funds")
         }
