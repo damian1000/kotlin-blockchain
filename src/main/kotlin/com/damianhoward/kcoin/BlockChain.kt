@@ -1,4 +1,4 @@
-package io.github.damian1000.kcoin
+package com.damianhoward.kcoin
 
 class BlockChain(
     val difficulty: Int,

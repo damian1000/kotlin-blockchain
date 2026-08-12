@@ -1,8 +1,8 @@
 # Kotlin Blockchain
 
-[![CI](https://github.com/damian1000/kotlin-blockchain/actions/workflows/ci.yml/badge.svg)](https://github.com/damian1000/kotlin-blockchain/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/damian1000/kotlin-blockchain/actions/workflows/codeql.yml/badge.svg)](https://github.com/damian1000/kotlin-blockchain/actions/workflows/codeql.yml)
-[![codecov](https://codecov.io/gh/damian1000/kotlin-blockchain/graph/badge.svg)](https://codecov.io/gh/damian1000/kotlin-blockchain)
+[![CI](https://github.com/damianhoward/kotlin-blockchain/actions/workflows/ci.yml/badge.svg)](https://github.com/damianhoward/kotlin-blockchain/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/damianhoward/kotlin-blockchain/actions/workflows/codeql.yml/badge.svg)](https://github.com/damianhoward/kotlin-blockchain/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/damianhoward/kotlin-blockchain/graph/badge.svg)](https://codecov.io/gh/damianhoward/kotlin-blockchain)
 
 A small blockchain in Kotlin that demonstrates the core primitives end-to-end: SHA-256 block hashing, proof-of-work mining, RSA-signed transactions, and a UTXO balance model with multi-wallet transfers.
 
