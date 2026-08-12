@@ -1,4 +1,4 @@
-package io.github.damian1000.kcoin
+package com.damianhoward.kcoin
 
 import java.math.BigInteger
 import java.security.Key
